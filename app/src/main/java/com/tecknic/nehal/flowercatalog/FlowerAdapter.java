@@ -10,8 +10,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tecknic.nehal.flowercatalog.model.Flower;
 
@@ -24,10 +26,12 @@ public class FlowerAdapter extends ArrayAdapter<Flower> {
     private Context context;
     private List<Flower> flowerList;
     private LruCache<Integer, Bitmap> imageCache;
+    private int resource;
 
     public FlowerAdapter(Context context, int resource, List<Flower> objects) {
         super(context, resource, objects);
         this.context = context;
+        this.resource = resource;
         this.flowerList = objects;
 
         final int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
@@ -39,15 +43,23 @@ public class FlowerAdapter extends ArrayAdapter<Flower> {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.item_flower, parent, false);
+        View view = inflater.inflate(this.resource, parent, false);
 
-        Flower flower = flowerList.get(position);
+        final Flower flower = flowerList.get(position);
         TextView tv = (TextView) view.findViewById(R.id.textView1);
         tv.setText(flower.getName());
 
         TextView pv = (TextView) view.findViewById(R.id.textViewPriceValue);
         double price = flower.getPrice();
         pv.setText(String.valueOf(price) + "$");
+
+        Button btnAC = (Button) (Button) view.findViewById(R.id.button1);
+        btnAC.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(context, "Product ID:" + flower.getProductId() , Toast.LENGTH_SHORT).show();
+            }
+        });
 
 
         Bitmap bitmap = imageCache.get(flower.getProductId());
@@ -104,4 +116,5 @@ public class FlowerAdapter extends ArrayAdapter<Flower> {
             imageCache.put(flowerAndView.flower.getProductId(), flowerAndView.bitmap);
         }
     }
+
 }
